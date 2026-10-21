@@ -55,12 +55,11 @@ export default function World({ team, onLevel }) {
     const seg = Math.min(p, 0.9999) * N
     const i = Math.floor(seg)
     const f = seg - i
-    const c = cam.get()
-    const idx = Math.round(c)
+    const idx = i
     setActive((a) => (a === idx ? a : idx))
     // tempo de ronda: 12:00 → 00:00 enquanto a câmara está parada no nível
     const hold = i >= N - 1 ? Math.min(1, f) : Math.min(1, f / 0.55)
-    onLevel(idx, Math.floor(c + 0.0001) + (p > 0.995 ? 1 : 0), hold)
+    onLevel(idx, i + (p > 0.995 ? 1 : 0), hold)
     const fr = Math.floor(p * 160) % 2
     setFrame((f) => (f === fr ? f : fr))
   })
