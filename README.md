@@ -10,12 +10,14 @@ Título → Como funciona → Pontuação → 6 estações → Rebenta a Bolha �
 - **Vídeo:** 11 clips Seedance 2.0 Mini 9:16 (Higgsfield). Cada clip começa na imagem da sua cena e acaba na imagem da seguinte, por isso não há cortes.
 - **Conteúdo e configuração:** `film.js`, que também tem o HUD de camcorder e o botão de copiar o email.
 - **Tema:** `film.css` com o tema cartoon (cartões cel com traço preto) e fontes self-hosted em `fonts/`.
-- **Mobile:** vídeo em ecrã inteiro com os cartões em baixo. **Desktop:** vídeo vertical à direita sobre fundo desfocado, com os cartões à esquerda.
+- **Computador (>860px, rato):** 11 clips 16:9 em `media/wide/` (imagens alargadas com outpaint + clips encadeados), em ecrã inteiro com os cartões à esquerda.
+- **Telemóvel (≤860px ou toque):** 11 clips 9:16 em `media/` em ecrã inteiro, com os cartões em baixo.
 
 ## Media
 
 ```bash
-scripts/encode.sh <pasta com clip-01..11.mp4>   # → media/clip-NN.mp4 + media/still-NN.webp
+scripts/encode.sh <pasta com clip-01..11.mp4 9:16>        # → media/clip-NN.mp4 + still-NN.webp
+scripts/encode-wide.sh <pasta com clip-01..11.mp4 16:9>   # → media/wide/clip-NN.mp4 + still-NN.webp
 ```
 
 ## Por decidir

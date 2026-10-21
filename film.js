@@ -6,8 +6,11 @@
 
   function sec(n, o) {
     var id = String(n).padStart(2, '0');
-    o.still = '/media/still-' + id + '.webp';
-    o.clip = '/media/clip-' + id + '.mp4';
+    // computador: 16:9 em ecrã inteiro · telemóvel (≤860px ou toque): 9:16
+    o.still = '/media/wide/still-' + id + '.webp';
+    o.clip = '/media/wide/clip-' + id + '.mp4';
+    o.stillMobile = '/media/still-' + id + '.webp';
+    o.clipMobile = '/media/clip-' + id + '.mp4';
     return o;
   }
 

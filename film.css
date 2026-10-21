@@ -223,32 +223,19 @@ body {
   .sw-scene__still { object-position: center 40% !important; }
 }
 
-/* ---------- desktop: vídeo vertical em ecrã inteiro sobre fundo desfocado ---------- */
+/* ---------- desktop: vídeo 16:9 em ecrã inteiro, cartões à esquerda ---------- */
 @media (min-width: 861px) {
   .sw-copy {
     translate: 0 -50%;
     width: min(38vw, 480px);
   }
-  /* fundo desfocado da própria cena + vídeo/still nítidos à direita */
-  .sw-scene::before {
-    content: "";
-    position: absolute;
-    inset: -60px;
-    background: var(--sw-still) center / cover no-repeat;
-    filter: blur(30px) brightness(0.42) saturate(1.2);
-  }
-  .sw-scene__still,
-  .sw-scene__video {
-    inset: 0 max(70px, 9vw) 0 auto !important;
-    width: calc(100svh * 9 / 16) !important;
-    height: 100svh !important;
-    object-fit: cover !important;
+  .sw-scene__video,
+  .sw-scene__still {
     object-position: 50% 50% !important;
-    transform: none !important;
-    box-shadow: 0 0 0 3px #07040f, 0 0 60px rgba(0, 0, 0, 0.6);
   }
   .sw-copylayer::before {
-    background: linear-gradient(90deg, rgba(15, 10, 36, 0.75) 0%, rgba(15, 10, 36, 0.3) 45%, transparent 60%) !important;
+    background: linear-gradient(90deg, rgba(15, 10, 36, 0.8) 0%, rgba(15, 10, 36, 0.45) 30%, transparent 55%) !important;
+    width: 100% !important;
   }
 }
 
