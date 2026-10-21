@@ -1,49 +1,28 @@
-# The 90's Marathon
+# The 90's Marathon — Press Start (versão Motion)
 
-Proposta de team building anos 90 em scrollytelling. New Sheet – Brand Activation × Revenge of the 90s.
-11 de dezembro de 2026 · MYRIAD by SANA Hotel.
+Proposta de team building anos 90 como um videojogo 16-bit:
+título → player select → manual → mundo de 6 níveis (scroll horizontal) → boss "Rebenta a Bolha" → créditos.
 
-Next.js (App Router) + TypeScript + GSAP ScrollTrigger + Lenis. Deploy na Vercel.
-
-## Estrutura
-
-| Cena | Componente | Técnica |
-|---|---|---|
-| Hero | `components/Hero.tsx` | Parede de 6 TVs CRT (um canal por estação, clicável) + título |
-| Ficha técnica | `components/Ficha.tsx` | Show-and-play (etiqueta VHS carimbada) |
-| Como funciona | `components/ComoFunciona.tsx` | Animated transition: 180 pontos → 12 equipas → 6 estações → rotação → top 6 |
-| Pontuação | `components/Pontuacao.tsx` | Graphic sequence (placar 10 / 5) |
-| Estações | `components/Estacoes.tsx`, `StationAnim.tsx`, `lib/scrub.ts` | Uma cena por estação: o clip Higgsfield (Seedance 2.0 Mini, 9:16) fica preso ao ecrã e a câmara entra no diorama com o scroll, enquanto as regras (etiqueta da cassete LADO A/B/C, Dinâmica, Pontuação, mini-animação SVG) passam por cima. Estática CRT ao mudar de canal |
-| Rebenta a Bolha | `components/DesafioFinal.tsx` | Sticky: 12 arcos a rebentar ao ritmo das ordens |
-| Fecho | `components/Fecho.tsx` | Contacto + copiar email |
-
-Todo o texto está em `lib/content.ts`.
-
-- Mobile-first (`svh`, sticky CSS, testado a 390px). Lenis só em desktop com rato; em toque o scroll é nativo.
-- `prefers-reduced-motion`: versão estática completa (sem vídeo, sem pinning).
-- Só se anima `transform`/`opacity`.
-- `robots: noindex`: é uma proposta para cliente.
-
-## Media
-
-Os renders originais do Higgsfield não estão no repo. `public/media/` tem as versões otimizadas:
-
-```bash
-scripts/process-media.sh <pasta-com-still-1..6.png-e-clip-1..6.mp4>
-python3 scripts/make-og.py <still-1.png>   # public/og.jpg
-```
-
-Clips: 540×960, H.264 CRF 25, GOP 4 (seeks baratos no telemóvel), sem áudio, carregados como Blob.
-
-## Desenvolvimento
+React 18 + Motion (`motion/react`) + Vite.
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:5173
+npm run build    # gera dist/ para deploy estático (Vercel)
 ```
 
-## TODO / por decidir
+## Regras de scrollytelling seguidas
+- Scroll nativo sempre no controlo (sem scroll-jacking nem snap); o mundo horizontal é uma secção alta com stage sticky.
+- Câmara "para" em cada nível (55% do troço) antes de avançar, para dar tempo de leitura.
+- Todo o texto está no DOM e legível sem animação; `prefers-reduced-motion` troca o mundo horizontal por uma lista vertical.
+- Só se anima transform/opacity; mobile-first com unidades `svh`.
 
-- [ ] **Gritómetro dos 90**: o deck original diz "34 pessoas por equipa / 17 palavras", o que não bate com equipas de 15. O site mantém o texto sem números até decidirmos.
-- [ ] **Nome / logo do cliente**: ainda não aparece (a confirmar).
-- [ ] **Domínio** final.
+## Estrutura
+- `src/content.js` — todo o texto da proposta (editar aqui).
+- `src/components/Pixel.jsx` — sprites pixel art a partir de mapas de texto.
+- `src/components/World.jsx` — o mundo de 6 estações.
+- `src/components/Boss.jsx` — desafio final.
+
+## Por decidir
+- Gritómetro: o deck original refere 34 pessoas/17 palavras por equipa, mas as equipas têm 15.
+- Nome/logo do cliente no ecrã de título.
