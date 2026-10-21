@@ -58,7 +58,10 @@ export function createScrubber(video: HTMLVideoElement, src: string, onReady?: (
       if (loading || disposed) return;
       loading = true;
       fetch(src)
-        .then((r) => r.blob())
+        .then((r) => {
+          if (!r.ok) throw new Error(`clip ${r.status}`);
+          return r.blob();
+        })
         .then((blob) => {
           if (disposed) return;
           url = URL.createObjectURL(blob);

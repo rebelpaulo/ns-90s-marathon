@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { contacto } from "@/lib/content";
 import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
 import s from "./Fecho.module.css";
@@ -8,6 +8,10 @@ import s from "./Fecho.module.css";
 export default function Fecho() {
   const root = useRef<HTMLElement>(null);
   const [copied, setCopied] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (timer.current) clearTimeout(timer.current);
+  }, []);
 
   const copy = async () => {
     let ok = false;
@@ -31,7 +35,8 @@ export default function Fecho() {
     }
     // Sem cópia: o email fica selecionado para o utilizador copiar à mão.
     setCopied(ok);
-    if (ok) setTimeout(() => setCopied(false), 2200);
+    if (timer.current) clearTimeout(timer.current);
+    if (ok) timer.current = setTimeout(() => setCopied(false), 2200);
   };
 
   useGSAP(
