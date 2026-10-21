@@ -3,11 +3,9 @@
 import { useRef } from "react";
 import { estacoes } from "@/lib/content";
 import { gsap, ScrollTrigger, useGSAP, MOTION_OK } from "@/lib/gsap";
-import { createScrubber } from "@/lib/scrub";
+import { createScrubber, type Scrubber } from "@/lib/scrub";
 import StationAnim from "./StationAnim";
 import s from "./Estacoes.module.css";
-
-const ZAP_IN = 0.05; // fração inicial da cena com estática de "mudar de canal"
 
 function stationTimeline(svg: SVGSVGElement, tl: gsap.core.Timeline) {
   const q = gsap.utils.selector(svg);
@@ -58,6 +56,10 @@ function stationTimeline(svg: SVGSVGElement, tl: gsap.core.Timeline) {
   }
 }
 
+/**
+ * Uma única viagem contínua: o clip da estação N começa na imagem da estação N e
+ * acaba na imagem da estação N+1, por isso a troca de clip na fronteira é invisível.
+ */
 export default function Estacoes() {
   const root = useRef<HTMLElement>(null);
 
@@ -65,59 +67,63 @@ export default function Estacoes() {
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        const disposers: Array<() => void> = [];
+        const el = root.current!;
+        const videos = Array.from(el.querySelectorAll<HTMLVideoElement>(`.${s.video}`));
+        const groups = gsap.utils.toArray<HTMLElement>(`.${s.group}`);
+        const osdCh = el.querySelector<HTMLElement>(`.${s.osdCh}`)!;
+        const osdName = el.querySelector<HTMLElement>(`.${s.osdName}`)!;
+        const bar = el.querySelector<HTMLElement>(`.${s.sceneBarFill}`)!;
+        const scrubbers: Scrubber[] = videos.map((v) => createScrubber(v, v.dataset.src!, () => v.classList.add(s.ready)));
+        let active = -1;
 
-        gsap.utils.toArray<HTMLElement>(`.${s.scene}`).forEach((scene) => {
-          const video = scene.querySelector<HTMLVideoElement>("video")!;
-          const zap = scene.querySelector<HTMLElement>(`.${s.zap}`)!;
-          const bar = scene.querySelector<HTMLElement>(`.${s.sceneBarFill}`)!;
-          const scrub = createScrubber(video, video.dataset.src!, () => video.classList.add(s.ready));
-          disposers.push(scrub.dispose);
+        const setActive = (i: number) => {
+          if (i === active) return;
+          active = i;
+          videos.forEach((v, k) => v.classList.toggle(s.on, k === i));
+          osdCh.textContent = `CH ${String(i + 1).padStart(2, "0")}`;
+          osdName.textContent = estacoes[i].nome;
+          // pré-carregar este clip e o seguinte
+          scrubbers[i]?.load();
+          scrubbers[i + 1]?.load();
+        };
 
-          // carregar o clip quando a cena está a ~2 ecrãs de distância
-          ScrollTrigger.create({ trigger: scene, start: "top 300%", once: true, onEnter: scrub.load });
+        // começar a carregar o 1.º clip quando a secção se aproxima
+        ScrollTrigger.create({ trigger: el, start: "top 300%", once: true, onEnter: () => setActive(0) });
 
-          // a câmara entra no diorama ao longo de toda a cena, enquanto as regras passam por cima
+        groups.forEach((g, i) => {
           ScrollTrigger.create({
-            trigger: scene,
-            start: "top top",
-            end: "bottom bottom",
+            trigger: g,
+            start: "top center",
+            end: "bottom center",
             onUpdate(self) {
-              const p = self.progress;
-              scrub.seek(Math.max(0, (p - ZAP_IN) / (1 - ZAP_IN)));
-              bar.style.transform = `scaleX(${p})`;
+              setActive(i);
+              scrubbers[i].seek(self.progress);
+              bar.style.transform = `scaleX(${(i + self.progress) / groups.length})`;
             },
+            onEnter: () => setActive(i),
+            onEnterBack: () => setActive(i),
           });
-
-          // estática ao entrar (mudar de canal)
-          gsap.fromTo(
-            zap,
-            { opacity: 1 },
-            { opacity: 0, ease: "power1.in", scrollTrigger: { trigger: scene, start: "top 40%", end: "top -10%", scrub: true } }
-          );
-
-          // cartões: entram e saem com o scroll
-          scene.querySelectorAll<HTMLElement>(`.${s.panel}`).forEach((panel) => {
-            gsap.fromTo(
-              panel,
-              { y: 60, opacity: 0 },
-              { y: 0, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: panel, start: "top 92%", end: "top 62%", scrub: 0.4 } }
-            );
-          });
-
-          const svg = scene.querySelector<SVGSVGElement>("svg[data-anim]");
-          if (svg) {
-            const tl = gsap.timeline({ scrollTrigger: { trigger: svg, start: "top 85%", end: "bottom 30%", scrub: 0.6 } });
-            stationTimeline(svg, tl);
-          }
-
-          const reels = scene.querySelectorAll(`.${s.reel}`);
-          if (reels.length) {
-            gsap.fromTo(reels, { rotate: 0 }, { rotate: 1080, ease: "none", scrollTrigger: { trigger: scene, start: "top bottom", end: "bottom top", scrub: true } });
-          }
         });
 
-        return () => disposers.forEach((d) => d());
+        el.querySelectorAll<HTMLElement>(`.${s.panel}`).forEach((panel) => {
+          gsap.fromTo(
+            panel,
+            { y: 60, opacity: 0 },
+            { y: 0, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: panel, start: "top 92%", end: "top 62%", scrub: 0.4 } }
+          );
+        });
+
+        el.querySelectorAll<SVGSVGElement>("svg[data-anim]").forEach((svg) => {
+          const tl = gsap.timeline({ scrollTrigger: { trigger: svg, start: "top 85%", end: "bottom 30%", scrub: 0.6 } });
+          stationTimeline(svg, tl);
+        });
+
+        const reels = el.querySelectorAll(`.${s.reel}`);
+        if (reels.length) {
+          gsap.fromTo(reels, { rotate: 0 }, { rotate: 2160, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
+        }
+
+        return () => scrubbers.forEach((sc) => sc.dispose());
       });
     },
     { scope: root }
@@ -130,22 +136,16 @@ export default function Estacoes() {
         <h2 id="est-h" className="h-display rgb">
           As estações
         </h2>
-        <p className="lead">Faz scroll: em cada canal entras na estação enquanto lês como se joga.</p>
+        <p className="lead">Faz scroll: é uma viagem só, de estação em estação, enquanto lês como se joga.</p>
       </div>
 
-      {estacoes.map((e) => (
-        <article
-          key={e.n}
-          id={`estacao-${e.n}`}
-          className={`${s.scene} ${e.n % 2 === 0 ? s.alt : ""}`}
-          style={{ ["--c" as string]: e.cor }}
-          aria-labelledby={`est-${e.n}`}
-        >
-          {/* fundo: vídeo do diorama em scrub, preso ao ecrã */}
-          <div className={s.sticky} aria-hidden="true">
-            <div className={s.backdrop} style={{ backgroundImage: `url(/media/clip-${e.n}.webp)` }} />
+      <div className={s.track}>
+        {/* fundo: uma viagem contínua, presa ao ecrã */}
+        <div className={s.sticky} aria-hidden="true">
+          {estacoes.map((e, i) => (
             <video
-              className={s.video}
+              key={e.n}
+              className={`${s.video} ${i === 0 ? s.on : ""}`}
               data-src={`/media/clip-${e.n}.mp4`}
               poster={`/media/clip-${e.n}.webp`}
               muted
@@ -153,55 +153,66 @@ export default function Estacoes() {
               preload="none"
               tabIndex={-1}
             />
-            <div className={s.scrim} />
-            <div className={s.zap} />
-            <div className={s.osd}>
-              <span className={s.osdCh}>CH {String(e.n).padStart(2, "0")}</span>
-              <span className={s.osdSide}>LADO {e.lado}</span>
-            </div>
-            <div className={s.sceneBar}>
-              <span className={s.sceneBarFill} />
-            </div>
+          ))}
+          <div className={s.scrim} />
+          <div className={s.osd}>
+            <span className={s.osdCh}>CH 01</span>
+            <span className={s.osdName}>{estacoes[0].nome}</span>
           </div>
+          <div className={s.sceneBar}>
+            <span className={s.sceneBarFill} />
+          </div>
+        </div>
 
-          {/* frente: a informação passa por cima do vídeo */}
-          <div className={s.steps}>
-            <div className={`${s.step} ${s.stepIntro}`}>
-              <div className={`${s.panel} ${s.intro}`}>
-                <div className={s.spine}>
-                  <span>LADO {e.lado}</span>
-                  <span className={s.reels} aria-hidden="true">
-                    <span className={s.reel} />
-                    <span className={s.reel} />
-                  </span>
-                  <span>Nº 0{e.n}</span>
-                </div>
-                <p className={s.kicker}>Estação {e.n}</p>
-                <h3 id={`est-${e.n}`} className={s.name}>
-                  {e.nome}
-                </h3>
-                {e.tagline && <p className={s.tagline}>{e.tagline}</p>}
-              </div>
-            </div>
-
-            {e.blocos.map((b, i) => (
-              <div key={b.titulo} className={s.step}>
-                <div className={`${s.panel} ${s.block}`}>
-                  <h4>{b.titulo}</h4>
-                  {b.texto.map((t, k) => (
-                    <p key={k}>{t}</p>
-                  ))}
-                  {i === 0 && (
-                    <div className={s.animWrap}>
-                      <StationAnim n={e.n} />
-                    </div>
-                  )}
+        {/* frente: a informação de cada estação passa por cima */}
+        <div className={s.steps}>
+          {estacoes.map((e) => (
+            <article
+              key={e.n}
+              id={`estacao-${e.n}`}
+              className={s.group}
+              style={{ ["--c" as string]: e.cor }}
+              aria-labelledby={`est-${e.n}`}
+            >
+              <div className={`${s.step} ${s.stepIntro}`}>
+                <div className={`${s.panel} ${s.intro}`}>
+                  <div className={s.spine}>
+                    <span>LADO {e.lado}</span>
+                    <span className={s.reels} aria-hidden="true">
+                      <span className={s.reel} />
+                      <span className={s.reel} />
+                    </span>
+                    <span>Nº 0{e.n}</span>
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className={s.rmStill} src={e.still} alt="" width={760} height={1344} loading="lazy" decoding="async" />
+                  <p className={s.kicker}>Estação {e.n}</p>
+                  <h3 id={`est-${e.n}`} className={s.name}>
+                    {e.nome}
+                  </h3>
+                  {e.tagline && <p className={s.tagline}>{e.tagline}</p>}
                 </div>
               </div>
-            ))}
-          </div>
-        </article>
-      ))}
+
+              {e.blocos.map((b, i) => (
+                <div key={b.titulo} className={s.step}>
+                  <div className={`${s.panel} ${s.block}`}>
+                    <h4>{b.titulo}</h4>
+                    {b.texto.map((t, k) => (
+                      <p key={k}>{t}</p>
+                    ))}
+                    {i === 0 && (
+                      <div className={s.animWrap}>
+                        <StationAnim n={e.n} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </article>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }

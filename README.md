@@ -1,4 +1,6 @@
-# The 90's Marathon
+# The 90's Marathon: versão cartoon 90s
+
+> Branch `cartoon-90s`, publicado num projeto Vercel separado. O `main` (Press Start) fica intacto.
 
 Proposta de team building anos 90 em scrollytelling. New Sheet – Brand Activation × Revenge of the 90s.
 11 de dezembro de 2026 · MYRIAD by SANA Hotel.
@@ -9,11 +11,11 @@ Next.js (App Router) + TypeScript + GSAP ScrollTrigger + Lenis. Deploy na Vercel
 
 | Cena | Componente | Técnica |
 |---|---|---|
-| Hero | `components/Hero.tsx` | Parede de 6 TVs CRT (um canal por estação, clicável) + título |
+| Hero | `components/Hero.tsx` | Parede de 6 TVs CRT com loops cartoon (um canal por estação, clicável) + título |
 | Ficha técnica | `components/Ficha.tsx` | Show-and-play (etiqueta VHS carimbada) |
 | Como funciona | `components/ComoFunciona.tsx` | Animated transition: 180 pontos → 12 equipas → 6 estações → rotação → top 6 |
 | Pontuação | `components/Pontuacao.tsx` | Graphic sequence (placar 10 / 5) |
-| Estações | `components/Estacoes.tsx`, `StationAnim.tsx`, `lib/scrub.ts` | Uma cena por estação: o clip Higgsfield (Seedance 2.0 Mini, 9:16) fica preso ao ecrã e a câmara entra no diorama com o scroll, enquanto as regras (etiqueta da cassete LADO A/B/C, Dinâmica, Pontuação, mini-animação SVG) passam por cima. Estática CRT ao mudar de canal |
+| Estações | `components/Estacoes.tsx`, `StationAnim.tsx`, `lib/scrub.ts` | Uma viagem contínua em cartoon 90s: 6 clips Seedance 2.0 Mini encadeados (cada clip começa na imagem da sua estação e acaba na imagem da seguinte, por isso não há cortes). As regras de cada estação passam por cima do vídeo preso ao ecrã |
 | Rebenta a Bolha | `components/DesafioFinal.tsx` | Sticky: 12 arcos a rebentar ao ritmo das ordens |
 | Fecho | `components/Fecho.tsx` | Contacto + copiar email |
 

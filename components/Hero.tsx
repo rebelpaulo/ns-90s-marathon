@@ -23,6 +23,13 @@ export default function Hero() {
         });
         gsap.from(`.${s.titleBlock} > *`, { y: 30, opacity: 0, stagger: 0.12, duration: 0.6, ease: "power3.out", delay: 0.6 });
 
+        // as TVs passam os clips em loop (só com movimento permitido)
+        const loops = gsap.utils.toArray<HTMLVideoElement>(`.${s.loop}`);
+        loops.forEach((v) => {
+          v.src = v.dataset.src!;
+          v.play().catch(() => {});
+        });
+
         // ao sair, a parede de TVs recua
         gsap.to(`.${s.wall}`, {
           scale: 0.86,
@@ -30,6 +37,13 @@ export default function Hero() {
           ease: "none",
           scrollTrigger: { trigger: root.current, start: "top top", end: "bottom top", scrub: true },
         });
+
+        return () =>
+          loops.forEach((v) => {
+            v.pause();
+            v.removeAttribute("src");
+            v.load();
+          });
       });
     },
     { scope: root }
@@ -40,8 +54,17 @@ export default function Hero() {
       <nav className={s.wall} aria-label="Canais: as 6 estações">
         {estacoes.map((e) => (
           <a key={e.n} href={`#estacao-${e.n}`} className={s.tv} style={{ ["--c" as string]: e.cor }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`/media/clip-${e.n}.webp`} alt="" width={540} height={960} fetchPriority={e.n <= 2 ? "high" : "auto"} />
+            <video
+              className={s.loop}
+              data-src={`/media/loop-${e.n}.mp4`}
+              poster={`/media/loop-${e.n}.webp`}
+              muted
+              loop
+              playsInline
+              preload="none"
+              aria-hidden="true"
+              tabIndex={-1}
+            />
             <span className={s.ch}>CH {String(e.n).padStart(2, "0")}</span>
             <span className={s.chName}>{e.nome}</span>
           </a>
