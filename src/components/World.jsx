@@ -67,7 +67,7 @@ export default function World({ team, onLevel }) {
 
   if (reduce) {
     return (
-      <section className="world-static gutter band-pad" id="world" aria-label="As 6 estações">
+      <section ref={ref} className="world-static gutter band-pad" id="world" aria-label="As 6 estações">
         <div className="wrap">
           <p className="kicker">WORLD 1 · AS 6 ESTAÇÕES</p>
           <div className="static-levels">
