@@ -1,0 +1,67 @@
+.pontuacao {
+  background:
+    radial-gradient(60% 50% at 50% 40%, rgba(123, 60, 255, 0.25), transparent 70%),
+    var(--bg-2);
+  border-top: 2px solid var(--line);
+  border-bottom: 2px solid var(--line);
+  perspective: 900px;
+}
+.boards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 36px 0 28px;
+}
+.board {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  padding: 18px 10px 16px;
+  background: #07040f;
+  border: 3px solid #2c2150;
+  border-radius: 14px;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+  text-align: center;
+}
+.ghost,
+.value {
+  grid-area: 1 / 1;
+  font-family: var(--f-mono);
+  font-size: clamp(96px, 30vw, 200px);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+.ghost {
+  color: rgba(243, 236, 255, 0.06);
+}
+.win .value {
+  color: var(--magenta);
+  text-shadow: 0 0 22px rgba(255, 46, 136, 0.7);
+}
+.lose .value {
+  color: var(--teal);
+  text-shadow: 0 0 22px rgba(0, 226, 207, 0.7);
+}
+.pts {
+  font-family: var(--f-display);
+  font-size: 18px;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-top: 4px;
+}
+.label {
+  margin-top: 6px;
+  font-size: 15px;
+  line-height: 1.3;
+  color: var(--ink-soft);
+  max-width: 18ch;
+}
+@media (min-width: 900px) {
+  .boards {
+    gap: 28px;
+    max-width: 860px;
+  }
+  .label {
+    font-size: 18px;
+  }
+}

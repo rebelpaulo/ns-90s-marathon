@@ -1,0 +1,85 @@
+.fecho {
+  background-color: var(--bg);
+  border-top: 2px solid var(--line);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
+}
+.inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  text-align: center;
+  gap: 22px;
+}
+.eject {
+  font-family: var(--f-mono);
+  font-size: 24px;
+  letter-spacing: 0.1em;
+  color: var(--teal);
+}
+.thanks {
+  font-size: clamp(40px, 11.2vw, 170px);
+}
+.card {
+  width: min(100%, 520px);
+  background: var(--ink);
+  color: var(--bg);
+  border-radius: 14px;
+  padding: 22px 20px;
+  box-shadow:
+    8px 8px 0 var(--magenta),
+    16px 16px 0 var(--teal);
+  display: grid;
+  gap: 4px;
+}
+.name {
+  font-family: var(--f-display);
+  font-size: clamp(26px, 7vw, 36px);
+  line-height: 1.1;
+}
+.role {
+  font-family: var(--f-mono);
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5b2bd6;
+}
+.mailRow {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+.mail {
+  font-weight: 800;
+  font-size: clamp(16px, 4.6vw, 20px);
+  user-select: all;
+  -webkit-user-select: all;
+  word-break: break-all;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.copy {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 18px;
+  font-family: var(--f-mono);
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: var(--bg);
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.copy:hover {
+  background: #2a1d5c;
+}
+.sign {
+  margin-top: 24px;
+  font-family: var(--f-mono);
+  font-size: 20px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
