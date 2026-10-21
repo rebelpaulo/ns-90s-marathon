@@ -71,9 +71,12 @@ export default function Fecho() {
             <a id="email" className={s.mail} href={`mailto:${contacto.email}`}>
               {contacto.email}
             </a>
-            <button type="button" className={s.copy} onClick={copy} aria-live="polite">
+            <button type="button" className={s.copy} onClick={copy}>
               {copied ? "Copiado ✓" : "Copiar"}
             </button>
+            <span className="sr-only" role="status" aria-live="polite">
+              {copied ? "Email copiado" : ""}
+            </span>
           </div>
         </div>
 

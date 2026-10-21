@@ -30,16 +30,18 @@ export default function DesafioFinal() {
             start: "top top",
             end: "bottom bottom",
             scrub: 0.4,
-            onUpdate(self) {
-              const idx = Math.min(ORDER.length, Math.floor(self.progress * (ORDER.length + 1.2)));
-              if (idx === lastIdx) return;
-              lastIdx = idx;
-              cmd.textContent = idx >= ORDER.length ? "FIM!" : desafioFinal.ordens[idx % desafioFinal.ordens.length];
-              count.textContent = `${12 - Math.min(idx, ORDER.length)} EM JOGO`;
-              gsap.fromTo(cmd, { scale: 1.25, opacity: 0.4 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(3)", overwrite: true });
-            },
+            onRefresh: (self) => render(self.progress),
+            onUpdate: (self) => render(self.progress),
           },
         });
+        function render(progress: number) {
+          const idx = Math.min(ORDER.length, Math.floor(progress * (ORDER.length + 1.2)));
+          if (idx === lastIdx) return;
+          lastIdx = idx;
+          cmd.textContent = idx >= ORDER.length ? "FIM!" : desafioFinal.ordens[idx % desafioFinal.ordens.length];
+          count.textContent = `${12 - Math.min(idx, ORDER.length)} EM JOGO`;
+          gsap.fromTo(cmd, { scale: 1.25, opacity: 0.4 }, { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(3)", overwrite: true });
+        }
 
         ORDER.forEach((h, k) => {
           tl.to(hoops[h], { scale: 1.18, duration: 0.25 }, k)
@@ -80,13 +82,14 @@ export default function DesafioFinal() {
           <p className={s.cmd} aria-hidden="true">
             {desafioFinal.ordens[0]}
           </p>
-          <ul className={s.hoops} aria-label="12 arcos, um por jogador">
+          <ul className={s.hoops} aria-hidden="true">
             {HOOPS.map((c, i) => (
               <li key={i} className={`${s.hoop} ${i === WINNER ? s.winner : ""}`} style={{ ["--h" as string]: c }}>
                 <span className={s.player} />
               </li>
             ))}
           </ul>
+          <p className="sr-only">12 arcos no chão, um por jogador: 2 jogadores de cada uma das 6 equipas finalistas.</p>
           <p className={s.win}>Ganha a equipa que ficar em jogo por último!</p>
         </div>
       </div>
