@@ -47,11 +47,12 @@ export function createScrubber(video: HTMLVideoElement, src: string, onReady?: (
 
   // iOS: "acordar" o decoder no primeiro toque
   const prime = () => {
-    if (!video.src) return;
+    if (!video.src) return; // clip ainda não carregou: esperar pelo próximo toque
+    window.removeEventListener("touchstart", prime);
     const p = video.play();
     if (p) p.then(() => video.pause()).catch(() => {});
   };
-  window.addEventListener("touchstart", prime, { once: true, passive: true });
+  window.addEventListener("touchstart", prime, { passive: true });
 
   return {
     load() {
