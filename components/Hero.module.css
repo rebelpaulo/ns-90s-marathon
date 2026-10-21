@@ -1,0 +1,189 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 18px;
+  padding: calc(env(safe-area-inset-top) + 56px) var(--gutter) calc(env(safe-area-inset-bottom) + 84px);
+  background:
+    radial-gradient(80% 50% at 50% 30%, rgba(123, 60, 255, 0.28), transparent 70%),
+    var(--bg);
+  overflow: hidden;
+}
+
+/* ---------- parede de TVs ---------- */
+.wall {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  transform-origin: 50% 0%;
+}
+.tv {
+  position: relative;
+  display: block;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  padding: 5px;
+  background: linear-gradient(160deg, #3a2c63, #1b1338 60%, #120c2a);
+  box-shadow:
+    0 0 0 2px #4b3a7c,
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 0 26px color-mix(in srgb, var(--c) 30%, transparent);
+  text-decoration: none;
+  color: var(--ink);
+  transform-origin: 50% 50%;
+}
+.tv img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+  border-radius: 10px;
+  filter: saturate(1.1);
+}
+.tv::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 10px;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.28) 2px 3px),
+    radial-gradient(110% 90% at 50% 40%, transparent 55%, rgba(0, 0, 0, 0.55));
+}
+.ch {
+  position: absolute;
+  z-index: 1;
+  top: 9px;
+  left: 11px;
+  font-family: var(--f-mono);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--teal);
+  text-shadow: 0 0 6px rgba(0, 226, 207, 0.8), 1px 1px 0 #000;
+}
+.chName {
+  position: absolute;
+  z-index: 1;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  padding: 14px 6px 5px;
+  border-radius: 0 0 10px 10px;
+  font-family: var(--f-mono);
+  font-size: 15px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  background: linear-gradient(to top, rgba(15, 10, 36, 0.92), transparent);
+}
+.tv:hover,
+.tv:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--c),
+    0 0 30px color-mix(in srgb, var(--c) 60%, transparent);
+}
+
+/* ---------- título ---------- */
+.titleBlock {
+  position: relative;
+  z-index: 2;
+  align-self: end;
+}
+.presents {
+  font-family: var(--f-mono);
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+.h1 {
+  font-size: clamp(44px, 12.8vw, 132px);
+}
+.sub {
+  margin-top: 14px;
+  font-size: 17px;
+  line-height: 1.45;
+  max-width: 36ch;
+}
+.meta {
+  margin-top: 10px;
+  font-family: var(--f-mono);
+  font-size: 21px;
+  color: var(--yellow);
+  letter-spacing: 0.04em;
+}
+
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 46px);
+  text-align: center;
+  font-family: var(--f-mono);
+  font-size: 20px;
+  letter-spacing: 0.1em;
+  color: var(--yellow);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hint {
+    animation: bob 1.6s ease-in-out infinite;
+  }
+}
+@keyframes bob {
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+/* telemóveis baixos: TVs mais pequenas */
+@media (max-height: 740px) and (max-width: 899px) {
+  .wall {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .tv {
+    aspect-ratio: 9 / 16;
+  }
+  .ch {
+    font-size: 14px;
+    top: 7px;
+    left: 8px;
+  }
+  .chName {
+    display: none;
+  }
+}
+
+/* ---------- desktop ---------- */
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-rows: 1fr;
+    align-items: center;
+    gap: 56px;
+    padding: 90px max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))) 110px;
+  }
+  .wall {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 16px;
+  }
+  .titleBlock {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+  .h1 {
+    font-size: clamp(52px, 5.2vw, 96px);
+  }
+  .sub {
+    font-size: 21px;
+  }
+  .ch {
+    font-size: 22px;
+  }
+  .chName {
+    font-size: 18px;
+  }
+}
