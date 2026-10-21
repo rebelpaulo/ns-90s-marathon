@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { motion } from 'motion/react'
 import { CONTACT, EVENT } from '../content.js'
 import Pixel from './Pixel.jsx'
 
 // Créditos finais: "THANK YOU FOR PLAYING" + contacto + logo New Sheet.
-export default function Credits({ team }) {
+function Credits({ team }) {
   const [copied, setCopied] = useState('Copiar email')
   const copy = async () => {
     try {
@@ -84,3 +84,5 @@ export default function Credits({ team }) {
     </footer>
   )
 }
+
+export default memo(Credits)

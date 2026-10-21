@@ -14,6 +14,7 @@ export default function Boss() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
 
   useMotionValueEvent(scrollYProgress, 'change', (p) => {
+    if (reduce) return
     const e = Math.max(0, Math.min(11, Math.round(((p - 0.25) / 0.6) * 11)))
     setOut(e)
     setStep(p < 0.15 ? 0 : p < 0.3 ? 1 : e < 11 ? 2 : 3)
@@ -31,7 +32,7 @@ export default function Boss() {
             <h2 id="boss-h" className="h2">{BOSS.name}</h2>
             <ol className="boss-steps">
               {BOSS.steps.map((s, i) => (
-                <li key={s.k} className={i === step ? 'on' : ''}>
+                <li key={s.k} className={reduce || i === step ? 'on' : ''}>
                   <b>{s.k}</b>
                   <span>{s.t}</span>
                 </li>

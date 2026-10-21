@@ -1,9 +1,10 @@
+import { memo } from 'react'
 import { motion } from 'motion/react'
 import { MANUAL, SCORE } from '../content.js'
 import Pixel from './Pixel.jsx'
 
 // Manual de instruções da cartridge: as regras e o sistema de pontos como "power-ups".
-export default function Manual() {
+function Manual() {
   return (
     <section className="manual band-pad gutter" id="manual" aria-labelledby="manual-h">
       <div className="wrap">
@@ -56,3 +57,5 @@ export default function Manual() {
     </section>
   )
 }
+
+export default memo(Manual)

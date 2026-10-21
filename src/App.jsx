@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { motion, useScroll, useSpring } from 'motion/react'
+import { motion, MotionConfig, useScroll, useSpring } from 'motion/react'
 import { TEAMS, LEVELS } from './content.js'
 import Title from './components/Title.jsx'
 import Select from './components/Select.jsx'
@@ -21,11 +21,12 @@ export default function App() {
 
   // cleared = estações já passadas; cada uma vale 10 (a melhor pontuação possível do jogador)
   const onLevel = useCallback((idx, cleared, hold) => {
-    setHud({ level: idx, score: cleared * 10, time: Math.round(720 * (1 - hold)) })
+    const next = { level: idx, score: cleared * 10, time: Math.round(720 * (1 - hold)) }
+    setHud((h) => (h.level === next.level && h.score === next.score && h.time === next.time ? h : next))
   }, [])
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <a className="skip" href="#credits">Saltar para o contacto</a>
       <div className="hud" aria-hidden="true">
         <div className="hud-cell">
@@ -45,6 +46,6 @@ export default function App() {
         <Boss />
       </main>
       <Credits team={team} />
-    </>
+    </MotionConfig>
   )
 }

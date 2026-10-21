@@ -1,9 +1,10 @@
+import { memo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { TEAMS } from '../content.js'
 import Pixel from './Pixel.jsx'
 
 // "Player select": escolher uma das 12 bandanas. A cor escolhida segue o jogador pelo resto do site.
-export default function Select({ team, setTeam }) {
+function Select({ team, setTeam }) {
   return (
     <section className="select band-pad gutter" id="select" aria-labelledby="select-h">
       <div className="wrap">
@@ -53,3 +54,5 @@ export default function Select({ team, setTeam }) {
     </section>
   )
 }
+
+export default memo(Select)

@@ -287,4 +287,5 @@ a:focus-visible, button:focus-visible { outline: 4px solid var(--coin); outline-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
+  .boss-steps li:not(.on) { display: grid; }
 }

@@ -1,10 +1,10 @@
 import { motion, useScroll, useTransform, useReducedMotion } from 'motion/react'
-import { useRef } from 'react'
+import { memo, useRef } from 'react'
 import { EVENT } from '../content.js'
 import Pixel from './Pixel.jsx'
 
 // Ecrã de título: "PRESS START". O logo da cartridge afasta-se e as estrelas fazem parallax ao sair.
-export default function Title({ team }) {
+function Title({ team }) {
   const ref = useRef(null)
   const reduce = useReducedMotion()
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
@@ -52,3 +52,5 @@ export default function Title({ team }) {
     </header>
   )
 }
+
+export default memo(Title)
