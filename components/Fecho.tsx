@@ -10,21 +10,28 @@ export default function Fecho() {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
+    let ok = false;
     try {
       await navigator.clipboard.writeText(contacto.email);
+      ok = true;
     } catch {
-      const r = document.createRange();
       const el = document.getElementById("email");
       if (el) {
+        const r = document.createRange();
         r.selectNodeContents(el);
         const sel = window.getSelection();
         sel?.removeAllRanges();
         sel?.addRange(r);
-        document.execCommand("copy");
+        try {
+          ok = document.execCommand("copy");
+        } catch {
+          ok = false;
+        }
       }
     }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2200);
+    // Sem cópia: o email fica selecionado para o utilizador copiar à mão.
+    setCopied(ok);
+    if (ok) setTimeout(() => setCopied(false), 2200);
   };
 
   useGSAP(
