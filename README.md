@@ -9,11 +9,11 @@ Next.js (App Router) + TypeScript + GSAP ScrollTrigger + Lenis. Deploy na Vercel
 
 | Cena | Componente | Técnica |
 |---|---|---|
-| Hero "INSERT TAPE" | `components/Hero.tsx` | Moviescroller: 6 clips Higgsfield (Seedance 2.0 Mini, 9:16) com scrub por scroll e "zapping" CRT entre canais |
+| Hero | `components/Hero.tsx` | Parede de 6 TVs CRT (um canal por estação, clicável) + título |
 | Ficha técnica | `components/Ficha.tsx` | Show-and-play (etiqueta VHS carimbada) |
 | Como funciona | `components/ComoFunciona.tsx` | Animated transition: 180 pontos → 12 equipas → 6 estações → rotação → top 6 |
 | Pontuação | `components/Pontuacao.tsx` | Graphic sequence (placar 10 / 5) |
-| Estações | `components/Estacoes.tsx`, `StationAnim.tsx` | Cassete por estação (LADO A/B/C) + mini-animação SVG |
+| Estações | `components/Estacoes.tsx`, `StationAnim.tsx`, `lib/scrub.ts` | Uma cena por estação: o clip Higgsfield (Seedance 2.0 Mini, 9:16) fica preso ao ecrã e a câmara entra no diorama com o scroll, enquanto as regras (etiqueta da cassete LADO A/B/C, Dinâmica, Pontuação, mini-animação SVG) passam por cima. Estática CRT ao mudar de canal |
 | Rebenta a Bolha | `components/DesafioFinal.tsx` | Sticky: 12 arcos a rebentar ao ritmo das ordens |
 | Fecho | `components/Fecho.tsx` | Contacto + copiar email |
 

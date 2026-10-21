@@ -2,18 +2,22 @@
 
 import { useRef } from "react";
 import { estacoes } from "@/lib/content";
-import { gsap, useGSAP, MOTION_OK } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP, MOTION_OK } from "@/lib/gsap";
+import { createScrubber } from "@/lib/scrub";
 import StationAnim from "./StationAnim";
 import s from "./Estacoes.module.css";
 
-const LADOS: Record<string, string> = { A: "Lado A", B: "Lado B", C: "Lado C" };
+const ZAP_IN = 0.05; // fração inicial da cena com estática de "mudar de canal"
 
 function stationTimeline(svg: SVGSVGElement, tl: gsap.core.Timeline) {
   const q = gsap.utils.selector(svg);
   switch (svg.dataset.anim) {
     case "quiz":
-      tl.fromTo(q(`.${s.buzzer}`), { scaleY: 1 }, { scaleY: 0.45, transformOrigin: "50% 100%", duration: 0.12, yoyo: true, repeat: 5, stagger: 0.18 }, 0)
-        .from(q(`.${s.q}`), { y: 20, opacity: 0, scale: 0.4, transformOrigin: "50% 50%", stagger: 0.2, duration: 0.4, ease: "back.out(3)" }, 0.1);
+      tl.fromTo(q(`.${s.buzzer}`), { scaleY: 1 }, { scaleY: 0.45, transformOrigin: "50% 100%", duration: 0.12, yoyo: true, repeat: 5, stagger: 0.18 }, 0).from(
+        q(`.${s.q}`),
+        { y: 20, opacity: 0, scale: 0.4, transformOrigin: "50% 50%", stagger: 0.2, duration: 0.4, ease: "back.out(3)" },
+        0.1
+      );
       break;
     case "canta": {
       const bars = q(`.${s.bar}`);
@@ -61,106 +65,142 @@ export default function Estacoes() {
     () => {
       const mm = gsap.matchMedia();
       mm.add(MOTION_OK, () => {
-        gsap.utils.toArray<HTMLElement>(`.${s.station}`).forEach((art) => {
-          const reels = art.querySelectorAll(`.${s.reel}`);
-          // cassete: bobines rodam com o scroll, capa entra
-          gsap.timeline({
-            scrollTrigger: { trigger: art, start: "top bottom", end: "bottom top", scrub: true },
-          })
-            .fromTo(reels, { rotate: 0 }, { rotate: 900, ease: "none" }, 0)
-            .fromTo(art.querySelector(`.${s.cover}`), { scale: 1.18 }, { scale: 1, ease: "none" }, 0);
+        const disposers: Array<() => void> = [];
 
-          gsap.from(art.querySelectorAll(`.${s.block}`), {
-            y: 40,
-            opacity: 0,
-            stagger: 0.12,
-            duration: 0.55,
-            ease: "power2.out",
-            scrollTrigger: { trigger: art.querySelector(`.${s.text}`), start: "top 80%", toggleActions: "play none none reverse" },
+        gsap.utils.toArray<HTMLElement>(`.${s.scene}`).forEach((scene) => {
+          const video = scene.querySelector<HTMLVideoElement>("video")!;
+          const zap = scene.querySelector<HTMLElement>(`.${s.zap}`)!;
+          const bar = scene.querySelector<HTMLElement>(`.${s.sceneBarFill}`)!;
+          const scrub = createScrubber(video, video.dataset.src!, () => video.classList.add(s.ready));
+          disposers.push(scrub.dispose);
+
+          // carregar o clip quando a cena está a ~2 ecrãs de distância
+          ScrollTrigger.create({ trigger: scene, start: "top 300%", once: true, onEnter: scrub.load });
+
+          // a câmara entra no diorama ao longo de toda a cena, enquanto as regras passam por cima
+          ScrollTrigger.create({
+            trigger: scene,
+            start: "top top",
+            end: "bottom bottom",
+            onUpdate(self) {
+              const p = self.progress;
+              scrub.seek(Math.max(0, (p - ZAP_IN) / (1 - ZAP_IN)));
+              bar.style.transform = `scaleX(${p})`;
+            },
           });
 
-          const svg = art.querySelector<SVGSVGElement>("svg[data-anim]");
+          // estática ao entrar (mudar de canal)
+          gsap.fromTo(
+            zap,
+            { opacity: 1 },
+            { opacity: 0, ease: "power1.in", scrollTrigger: { trigger: scene, start: "top 40%", end: "top -10%", scrub: true } }
+          );
+
+          // cartões: entram e saem com o scroll
+          scene.querySelectorAll<HTMLElement>(`.${s.panel}`).forEach((panel) => {
+            gsap.fromTo(
+              panel,
+              { y: 60, opacity: 0 },
+              { y: 0, opacity: 1, ease: "power2.out", scrollTrigger: { trigger: panel, start: "top 92%", end: "top 62%", scrub: 0.4 } }
+            );
+          });
+
+          const svg = scene.querySelector<SVGSVGElement>("svg[data-anim]");
           if (svg) {
-            const tl = gsap.timeline({
-              scrollTrigger: { trigger: svg, start: "top 85%", end: "bottom 35%", scrub: 0.6 },
-            });
+            const tl = gsap.timeline({ scrollTrigger: { trigger: svg, start: "top 85%", end: "bottom 30%", scrub: 0.6 } });
             stationTimeline(svg, tl);
+          }
+
+          const reels = scene.querySelectorAll(`.${s.reel}`);
+          if (reels.length) {
+            gsap.fromTo(reels, { rotate: 0 }, { rotate: 1080, ease: "none", scrollTrigger: { trigger: scene, start: "top bottom", end: "bottom top", scrub: true } });
           }
         });
 
-        gsap.utils.toArray<HTMLElement>(`.${s.side}`).forEach((side) => {
-          gsap.from(side, {
-            xPercent: -12,
-            opacity: 0,
-            duration: 0.6,
-            ease: "power3.out",
-            scrollTrigger: { trigger: side, start: "top 85%", toggleActions: "play none none reverse" },
-          });
-        });
+        return () => disposers.forEach((d) => d());
       });
     },
     { scope: root }
   );
 
   return (
-    <section ref={root} className={`section ${s.estacoes}`} id="estacoes" aria-labelledby="est-h">
-      <div className="wrap">
+    <section ref={root} className={s.estacoes} id="estacoes" aria-labelledby="est-h">
+      <div className={`wrap ${s.head}`}>
         <p className="eyebrow">6 cassetes · 6 estações</p>
         <h2 id="est-h" className="h-display rgb">
           As estações
         </h2>
+        <p className="lead">Faz scroll: em cada canal entras na estação enquanto lês como se joga.</p>
       </div>
 
-      {estacoes.map((e, i) => (
-        <div key={e.n}>
-          {(i === 0 || estacoes[i - 1].lado !== e.lado) && (
-            <div className={`wrap ${s.sideWrap}`}>
-              <p className={s.side}>
-                <span>▶</span> {LADOS[e.lado]}
-              </p>
+      {estacoes.map((e) => (
+        <article
+          key={e.n}
+          id={`estacao-${e.n}`}
+          className={`${s.scene} ${e.n % 2 === 0 ? s.alt : ""}`}
+          style={{ ["--c" as string]: e.cor }}
+          aria-labelledby={`est-${e.n}`}
+        >
+          {/* fundo: vídeo do diorama em scrub, preso ao ecrã */}
+          <div className={s.sticky} aria-hidden="true">
+            <div className={s.backdrop} style={{ backgroundImage: `url(/media/clip-${e.n}.webp)` }} />
+            <video
+              className={s.video}
+              data-src={`/media/clip-${e.n}.mp4`}
+              poster={`/media/clip-${e.n}.webp`}
+              muted
+              playsInline
+              preload="none"
+              tabIndex={-1}
+            />
+            <div className={s.scrim} />
+            <div className={s.zap} />
+            <div className={s.osd}>
+              <span className={s.osdCh}>CH {String(e.n).padStart(2, "0")}</span>
+              <span className={s.osdSide}>LADO {e.lado}</span>
             </div>
-          )}
-          <article className={`wrap ${s.station} ${e.n % 2 === 0 ? s.alt : ""}`} style={{ ["--c" as string]: e.cor }} aria-labelledby={`est-${e.n}`}>
-            <div className={s.visual}>
-              <div className={s.cassette}>
+            <div className={s.sceneBar}>
+              <span className={s.sceneBarFill} />
+            </div>
+          </div>
+
+          {/* frente: a informação passa por cima do vídeo */}
+          <div className={s.steps}>
+            <div className={`${s.step} ${s.stepIntro}`}>
+              <div className={`${s.panel} ${s.intro}`}>
                 <div className={s.spine}>
                   <span>LADO {e.lado}</span>
+                  <span className={s.reels} aria-hidden="true">
+                    <span className={s.reel} />
+                    <span className={s.reel} />
+                  </span>
                   <span>Nº 0{e.n}</span>
                 </div>
-                <div className={s.coverWrap}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className={s.cover} src={e.still} alt="" width={760} height={1344} loading="lazy" decoding="async" />
-                </div>
-                <div className={s.window} aria-hidden="true">
-                  <span className={s.reel} />
-                  <span className={s.tapeBand} />
-                  <span className={s.reel} />
-                </div>
-              </div>
-              <div className={s.animWrap}>
-                <StationAnim n={e.n} />
+                <p className={s.kicker}>Estação {e.n}</p>
+                <h3 id={`est-${e.n}`} className={s.name}>
+                  {e.nome}
+                </h3>
+                {e.tagline && <p className={s.tagline}>{e.tagline}</p>}
               </div>
             </div>
 
-            <div className={s.text}>
-              <p className={s.kicker}>Estação {e.n}</p>
-              <h3 id={`est-${e.n}`} className={s.name}>
-                {e.nome}
-              </h3>
-              {e.tagline && <p className={s.tagline}>{e.tagline}</p>}
-              <div className={s.blocks}>
-                {e.blocos.map((b) => (
-                  <div key={b.titulo} className={s.block}>
-                    <h4>{b.titulo}</h4>
-                    {b.texto.map((t, k) => (
-                      <p key={k}>{t}</p>
-                    ))}
-                  </div>
-                ))}
+            {e.blocos.map((b, i) => (
+              <div key={b.titulo} className={s.step}>
+                <div className={`${s.panel} ${s.block}`}>
+                  <h4>{b.titulo}</h4>
+                  {b.texto.map((t, k) => (
+                    <p key={k}>{t}</p>
+                  ))}
+                  {i === 0 && (
+                    <div className={s.animWrap}>
+                      <StationAnim n={e.n} />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </article>
-        </div>
+            ))}
+          </div>
+        </article>
       ))}
     </section>
   );
