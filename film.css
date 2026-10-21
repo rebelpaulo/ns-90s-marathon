@@ -1,0 +1,259 @@
+@font-face { font-family: "Bungee Shade"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/bungee-shade-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Bungee"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/bungee-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "VT323"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/vt323-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 400; font-display: swap; src: url("/fonts/archivo-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 600; font-display: swap; src: url("/fonts/archivo-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Archivo"; font-style: normal; font-weight: 800; font-display: swap; src: url("/fonts/archivo-latin-800-normal.woff2") format("woff2"); }
+
+/* The 90's Marathon — tema cartoon 90s por cima do motor scroll-world */
+:root,
+.sw-root {
+  --sw-bg: #0f0a24;
+  --sw-ink: #f3ecff;
+  --sw-ink-soft: #cfc5ec;
+  --sw-accent: #ffd23f;
+  --sw-font-display: "Bungee", system-ui, sans-serif;
+  --sw-font-body: "Archivo", system-ui, -apple-system, sans-serif;
+  color-scheme: dark;
+}
+html {
+  overflow-x: clip;
+}
+body {
+  margin: 0;
+  background: #0f0a24;
+  color: #f3ecff;
+  font-family: "Archivo", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+.skip {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 300;
+  background: #ffd23f;
+  color: #0f0a24;
+  padding: 10px 14px;
+  font-family: "VT323", monospace;
+  font-size: 20px;
+  transform: translateY(-200%);
+}
+.skip:focus {
+  transform: none;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+:focus-visible {
+  outline: 3px solid #ffd23f;
+  outline-offset: 3px;
+}
+
+/* ---------- CRT + HUD ---------- */
+.crt {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0, 0, 0, 0.2) 3px, transparent 4px),
+    radial-gradient(120% 90% at 50% 50%, transparent 62%, rgba(4, 2, 14, 0.5) 100%);
+  mix-blend-mode: multiply;
+}
+.hud {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+  font-family: "VT323", monospace;
+}
+.hud__t {
+  position: absolute;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  background: rgba(15, 10, 36, 0.55);
+  color: #f3ecff;
+  text-shadow: 0 0 6px rgba(243, 236, 255, 0.6);
+  white-space: nowrap;
+}
+.hud__tl { top: calc(env(safe-area-inset-top) + 12px); left: 10px; }
+.hud__tr { top: calc(env(safe-area-inset-top) + 12px); right: 10px; display: flex; align-items: center; gap: 6px; }
+.hud__bl { bottom: calc(env(safe-area-inset-bottom) + 14px); left: 10px; }
+.hud__br { bottom: calc(env(safe-area-inset-bottom) + 14px); right: 10px; font-variant-numeric: tabular-nums; }
+.hud__dot { width: 11px; height: 11px; border-radius: 50%; background: #ff3b3b; box-shadow: 0 0 8px #ff3b3b; }
+@media (prefers-reduced-motion: no-preference) {
+  .hud__dot { animation: blink 1.2s steps(1) infinite; }
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ---------- motor: ajustes ---------- */
+.sw-scrollbar {
+  top: auto;
+  bottom: env(safe-area-inset-bottom);
+  height: 6px;
+  z-index: 85;
+}
+.sw-scrollbar span {
+  background: linear-gradient(90deg, #ff2e88, #ffd23f, #00e2cf);
+}
+.sw-topbar { display: none; }
+.sw-hint { color: #ffd23f; font-family: "VT323", monospace; font-size: 20px; top: calc(env(safe-area-inset-top) + 52px); bottom: auto !important; }
+.sw-route__dot i { border: 2px solid #07040f; }
+.sw-route__label { background: #f3ecff; color: #0f0a24; border: 2px solid #07040f; font-family: "VT323", monospace; font-size: 18px; }
+
+/* a leitura vem dos cartões, não de um véu sobre o vídeo */
+.sw-copylayer::before {
+  background: linear-gradient(0deg, rgba(15, 10, 36, 0.85) 0%, rgba(15, 10, 36, 0.35) 40%, transparent 70%) !important;
+  width: 100% !important;
+}
+
+/* cartão de texto em cel de desenho animado */
+.sw-copy {
+  background: rgba(15, 10, 36, 0.93);
+  border: 3px solid #07040f;
+  outline: 2px solid var(--sw-accent);
+  outline-offset: -7px;
+  border-radius: 14px;
+  padding: 18px 20px 20px;
+  box-shadow: 7px 7px 0 #07040f, 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+.sw-copy__num {
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  color: var(--sw-ink-soft);
+}
+.sw-copy__eyebrow {
+  margin-top: 8px;
+  font-family: "VT323", monospace;
+  font-weight: 400;
+  font-size: 22px;
+  letter-spacing: 0.08em;
+  color: var(--sw-accent);
+}
+.sw-copy__title {
+  font-family: "Bungee", system-ui, sans-serif;
+  font-weight: 400;
+  color: #f3ecff;
+  margin-top: 6px;
+  text-shadow: 2px 0 0 rgba(255, 46, 136, 0.85), -2px 0 0 rgba(0, 226, 207, 0.85);
+}
+.sw-copy__body {
+  margin-top: 12px;
+  color: #f3ecff;
+  text-shadow: none;
+}
+.sw-copy__tags li {
+  color: #0f0a24;
+  background: var(--sw-accent);
+  border: 2px solid #07040f;
+  font-weight: 800;
+}
+
+/* título de abertura em Bungee Shade */
+.sw-copy:first-child .sw-copy__title {
+  font-family: "Bungee Shade", "Bungee", sans-serif;
+  color: #ffd23f;
+  font-size: clamp(2.4rem, 11vw, 5rem);
+  line-height: 0.95;
+  text-shadow: 3px 0 0 #ff2e88, -3px 0 0 #00e2cf;
+}
+
+/* placar */
+.score {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+.score div {
+  background: #07040f;
+  border: 2px solid #2c2150;
+  border-radius: 10px;
+  padding: 8px;
+  text-align: center;
+}
+.score b {
+  display: block;
+  font-family: "VT323", monospace;
+  font-size: 72px;
+  line-height: 0.9;
+  text-shadow: 0 0 18px currentColor;
+}
+.score span {
+  font-size: 14px;
+  color: #cfc5ec;
+}
+
+/* contacto */
+.contact { margin-top: 12px; }
+.contact__name { font-family: "Bungee", sans-serif; font-size: 26px; margin: 0; }
+.contact__role { font-family: "VT323", monospace; font-size: 22px; color: #00e2cf; margin: 2px 0 0; text-transform: uppercase; }
+.contact__mail { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 12px 0 0; }
+.contact__mail a { color: #f3ecff; font-weight: 800; word-break: break-all; user-select: all; -webkit-user-select: all; }
+.copy {
+  min-height: 44px;
+  padding: 8px 16px;
+  font-family: "VT323", monospace;
+  font-size: 22px;
+  color: #0f0a24;
+  background: #ffd23f;
+  border: 2px solid #07040f;
+  border-radius: 8px;
+  box-shadow: 3px 3px 0 #07040f;
+  cursor: pointer;
+}
+
+/* ---------- mobile: vídeo em ecrã inteiro, cartão em baixo ---------- */
+@media (max-width: 860px) {
+  .sw-copy {
+    bottom: calc(clamp(60px, 11dvh, 100px) + env(safe-area-inset-bottom)) !important;
+    max-height: 62svh;
+    overflow: auto;
+  }
+  .sw-copy__title { font-size: clamp(1.6rem, 7.6vw, 2.3rem); }
+  .sw-scene__video,
+  .sw-scene__still { object-position: center 40% !important; }
+}
+
+/* ---------- desktop: vídeo vertical em ecrã inteiro sobre fundo desfocado ---------- */
+@media (min-width: 861px) {
+  .sw-copy {
+    translate: 0 -50%;
+    width: min(38vw, 480px);
+  }
+  /* fundo desfocado da própria cena + vídeo/still nítidos à direita */
+  .sw-scene::before {
+    content: "";
+    position: absolute;
+    inset: -60px;
+    background: var(--sw-still) center / cover no-repeat;
+    filter: blur(30px) brightness(0.42) saturate(1.2);
+  }
+  .sw-scene__still,
+  .sw-scene__video {
+    inset: 0 max(70px, 9vw) 0 auto !important;
+    width: calc(100svh * 9 / 16) !important;
+    height: 100svh !important;
+    object-fit: cover !important;
+    object-position: 50% 50% !important;
+    transform: none !important;
+    box-shadow: 0 0 0 3px #07040f, 0 0 60px rgba(0, 0, 0, 0.6);
+  }
+  .sw-copylayer::before {
+    background: linear-gradient(90deg, rgba(15, 10, 36, 0.75) 0%, rgba(15, 10, 36, 0.3) 45%, transparent 60%) !important;
+  }
+}
+
+.nojs { padding: 40px 16px; font-family: "Archivo", sans-serif; }
+
+@media (prefers-reduced-motion: reduce) {
+  .crt { display: none; }
+}
